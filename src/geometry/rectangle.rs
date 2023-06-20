@@ -15,7 +15,17 @@ impl Rectangle {
 
 impl Geometry for Rectangle {
     #[inline(always)]
-    fn contains(&self, _: grid::X) -> bool {
-        unimplemented!()
+    fn contains(&self, point: grid::X) -> bool {
+        let x = point.0 as num;
+        let y = point.1 as num;
+        let x_center = self.x_center[0];
+        let y_center = self.x_center[1];
+        let x_length = self.lengths[0];
+        let y_length = self.lengths[1];
+
+        x >= x_center - x_length / 2.
+            && x <= x_center + x_length / 2.
+            && y >= y_center - y_length / 2.
+            && y <= y_center + y_length / 2.
     }
 }
