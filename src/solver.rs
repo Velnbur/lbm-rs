@@ -4,10 +4,10 @@ use crate::boundary;
 use crate::grid;
 use crate::io::vtk;
 use crate::num;
-use crate::time;
 use crate::traits::DistributionStorage;
 use crate::traits::Physics;
 use crate::Distribution;
+use time;
 
 /// Lattice-Boltzmann Solver state
 pub struct Solver<P: Physics> {
@@ -56,7 +56,7 @@ impl<P: Physics> Solver<P> {
     }
 
     /// Reference to the distribution function `i` of the cell `c`
-    fn f_ref(&self, c: grid::Idx, i: P::Distribution) -> &num {
+    pub fn f_ref(&self, c: grid::Idx, i: P::Distribution) -> &num {
         &self.f[Self::f_idx(c, i)]
     }
 
@@ -129,7 +129,7 @@ impl<P: Physics> Solver<P> {
     /// Executes `n_it` iterations writing output every `n_out` iterations.
     pub fn run(&mut self, n_it: usize, n_out: usize) {
         let mut n_it = n_it;
-        assert!(n_it > 0);
+        assert!(n_it > 0, "n_it must be positive");
         let mut iter = 0;
         use time::Duration;
 

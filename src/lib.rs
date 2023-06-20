@@ -1,8 +1,5 @@
 #![cfg_attr(feature = "cargo-clippy", allow(inline_always))]
 
-pub extern crate rayon;
-extern crate time;
-
 // TODO: parametrize on floating point type (currently num)
 
 #[allow(non_camel_case_types)]
