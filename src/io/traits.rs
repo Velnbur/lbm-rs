@@ -1,5 +1,5 @@
 //! I/O traits
-use ::num;
+use crate::num;
 
 /// Point trait TODO: move this to geometry
 pub trait Point {
@@ -25,16 +25,20 @@ pub trait CellGeometry {
     fn cell_points(&self) -> Self::PointIterator;
 }
 
-
 pub trait CellDataWriter<CellIdx> {
-    fn write_scalar<T: Primitive>(&mut self, name: &str, f: Fn(CellIdx) -> T);
+    fn write_scalar<T: Primitive>(
+        &mut self,
+        name: &str,
+        f: impl Fn(CellIdx) -> T,
+    );
 }
 
 pub trait Serializable {
     type CellIndex;
     type CellGeometry: CellGeometry;
     type CellIndexIterator: Iterator<Item = Self::CellIndex>;
+
     fn cells(&self) -> Self::CellIndexIterator;
-    fn geometry(&self, Self::CellIndex) -> Self::CellGeometry;
-    fn cell_data<T: CellDataWriter<Self::CellIndex>>(&self, &mut T);
+    fn geometry(&self, _: Self::CellIndex) -> Self::CellGeometry;
+    fn cell_data<T: CellDataWriter<Self::CellIndex>>(&self, t: &mut T);
 }

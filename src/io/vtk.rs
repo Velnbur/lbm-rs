@@ -1,9 +1,9 @@
-use std::io::prelude::*;
-use std::fs::File;
 use std::fmt::Display;
+use std::fs::File;
+use std::io::prelude::*;
 
-use grid::*;
-use num;
+use crate::grid::*;
+use crate::num;
 
 pub trait Primitive: Display {
     fn type_name() -> &'static str;
@@ -20,7 +20,6 @@ impl Primitive for f64 {
         "double"
     }
 }
-
 
 impl Primitive for i32 {
     fn type_name() -> &'static str {
@@ -70,16 +69,18 @@ pub fn write_vtk(fname: &str, grid: StructuredRectangular) -> CellDataWriter {
     let mut buffer = File::create(format!("{}.vtk", fname)).unwrap();
 
     // Write Header
-    buffer.write(b"# vtk DataFile Version 2.0\n\
+    buffer
+        .write(
+            b"# vtk DataFile Version 2.0\n\
                    LBM test output\n\
                    ASCII\n\
-                   DATASET UNSTRUCTURED_GRID\n"
-    ).unwrap();
+                   DATASET UNSTRUCTURED_GRID\n",
+        )
+        .unwrap();
 
     let x_stencil = [-1., 1., -1., 1.];
     let y_stencil = [-1., -1., 1., 1.];
     let length = 1.;
-
 
     // Write grid points
     buffer
@@ -112,11 +113,11 @@ pub fn write_vtk(fname: &str, grid: StructuredRectangular) -> CellDataWriter {
                     4 * c.0 + 1,
                     4 * c.0 + 2,
                     4 * c.0 + 3
-                ).as_bytes(),
+                )
+                .as_bytes(),
             )
             .unwrap();
     }
-
 
     buffer
         .write(format!("CELL_TYPES {}\n", grid.size()).as_bytes())

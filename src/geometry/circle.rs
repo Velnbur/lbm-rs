@@ -1,6 +1,6 @@
-use num;
-use grid;
 use super::Geometry;
+use crate::grid;
+use crate::num;
 
 pub struct Circle {
     x_c: num,
@@ -24,6 +24,8 @@ impl Geometry for Circle {
     #[inline(always)]
     fn contains(&self, x: grid::X) -> bool {
         ((self.x_c - x.0 as num).powf(2.) + (self.y_c - x.1 as num).powf(2.))
-            .sqrt() - self.r < 0.
+            .sqrt()
+            - self.r
+            < 0.
     }
 }

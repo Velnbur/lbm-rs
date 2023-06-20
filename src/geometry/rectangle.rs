@@ -1,6 +1,6 @@
-use num;
-use grid;
 use super::Geometry;
+use crate::grid;
+use crate::num;
 
 pub struct Rectangle {
     x_center: [num; 2],

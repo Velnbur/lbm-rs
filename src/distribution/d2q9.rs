@@ -1,7 +1,7 @@
+use crate::geometry::Direction;
+use crate::num;
+use crate::traits;
 use std;
-use num;
-use geometry::Direction;
-use traits;
 
 #[derive(Eq, Ord, PartialEq, PartialOrd, Copy, Clone, Debug)]
 #[repr(usize)]
@@ -126,6 +126,9 @@ impl traits::DiagonalDistribution for D2Q9 {
 #[cfg(test)]
 mod tests {
     use super::D2Q9;
+
+    use super::traits::Distribution;
+
     #[test]
     fn opposite() {
         assert_eq!(D2Q9::C.opposite(), D2Q9::C);
@@ -140,15 +143,15 @@ mod tests {
     }
     #[test]
     fn velocities() {
-        assert_eq!(D2Q9::C.direction(), [0, 0]);
-        assert_eq!(D2Q9::E.direction(), [1, 0]);
-        assert_eq!(D2Q9::N.direction(), [0, 1]);
-        assert_eq!(D2Q9::W.direction(), [-1, 0]);
-        assert_eq!(D2Q9::S.direction(), [0, -1]);
-        assert_eq!(D2Q9::NE.direction(), [1, 1]);
-        assert_eq!(D2Q9::NW.direction(), [-1, 1]);
-        assert_eq!(D2Q9::SW.direction(), [-1, -1]);
-        assert_eq!(D2Q9::SE.direction(), [1, -1]);
+        assert_eq!(D2Q9::C.direction().array(), [0, 0]);
+        assert_eq!(D2Q9::E.direction().array(), [1, 0]);
+        assert_eq!(D2Q9::N.direction().array(), [0, 1]);
+        assert_eq!(D2Q9::W.direction().array(), [-1, 0]);
+        assert_eq!(D2Q9::S.direction().array(), [0, -1]);
+        assert_eq!(D2Q9::NE.direction().array(), [1, 1]);
+        assert_eq!(D2Q9::NW.direction().array(), [-1, 1]);
+        assert_eq!(D2Q9::SW.direction().array(), [-1, -1]);
+        assert_eq!(D2Q9::SE.direction().array(), [1, -1]);
     }
     #[test]
     fn values() {
@@ -162,6 +165,4 @@ mod tests {
         }
         assert_eq!(D2Q9::size(), D2Q9::all().count());
     }
-
-
 }

@@ -1,12 +1,16 @@
 //! Navier-Stokes physics
+use crate::distribution;
+use crate::grid;
+use crate::io::vtk;
+use crate::num;
+use crate::traits;
+use crate::traits::Collision;
+use crate::traits::DiagonalDistribution;
+use crate::traits::DirectDistribution;
 use std;
-use num;
-use io::vtk;
-use grid;
-use distribution;
 
 /// Navier-Stokes distributions:
-pub trait Distribution: ::DirectDistribution + ::DiagonalDistribution {
+pub trait Distribution: DirectDistribution + DiagonalDistribution {
     #[inline(always)]
     fn density<F: Fn(Self) -> num>(f: F) -> num {
         let mut rho = 0.;
@@ -44,7 +48,7 @@ pub struct SingleRelaxationTime {
     pub omega: num,
 }
 
-impl<D: Distribution> ::Collision<D> for SingleRelaxationTime {
+impl<D: Distribution> Collision<D> for SingleRelaxationTime {
     #[inline(always)]
     fn collision<H, IH>(&self, f_hlp: &H, idx_h: IH) -> D::Storage
     where
@@ -102,15 +106,14 @@ impl<D: Distribution> ::Collision<D> for SingleRelaxationTime {
 }
 
 #[derive(Copy, Clone)]
-pub struct NavierStokes<D: Distribution, C: ::Collision<D>> {
+pub struct NavierStokes<D: Distribution, C: Collision<D>> {
     pub inflow_density: num,
     pub inflow_accel: num,
     collision: C,
     __dist: std::marker::PhantomData<D>,
 }
 
-
-impl<D: Distribution, C: ::Collision<D>> NavierStokes<D, C> {
+impl<D: Distribution, C: Collision<D>> NavierStokes<D, C> {
     pub fn new(density: num, accel: num, col: C) -> Self {
         Self {
             inflow_density: density,
@@ -137,8 +140,7 @@ impl<D: Distribution, C: ::Collision<D>> NavierStokes<D, C> {
     }
 }
 
-impl<D: Distribution, C: ::Collision<D>> ::traits::Physics
-    for NavierStokes<D, C> {
+impl<D: Distribution, C: Collision<D>> traits::Physics for NavierStokes<D, C> {
     type Distribution = D;
     #[inline(always)]
     fn collision<H, IH>(&self, f_hlp: &H, idx_h: IH) -> D::Storage

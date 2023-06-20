@@ -1,4 +1,4 @@
-use ::num;
+use crate::num;
 use std;
 
 pub trait AmbientDimension {
@@ -9,19 +9,14 @@ pub trait ObjectDimension {
     fn object_dimension(&self) -> usize;
 }
 
-pub trait Point: AmbientDimension + ObjectDimension + std::ops::Index<num> {
-
-}
-
-struct Point2D {
-    x: [num; 2]
+pub trait Point:
+    AmbientDimension + ObjectDimension + std::ops::Index<num>
+{
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
-    fn point_tests() {
-    }
+    fn point_tests() {}
 }

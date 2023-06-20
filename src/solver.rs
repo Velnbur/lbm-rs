@@ -1,14 +1,16 @@
 //! Implements the Lattice-Boltzmann solver.
 
-use num;
-use grid;
-use boundary;
-use io::{vtk, Serializable};
-use time;
-use traits::{Distribution, DistributionStorage};
+use crate::boundary;
+use crate::grid;
+use crate::io::vtk;
+use crate::num;
+use crate::time;
+use crate::traits::DistributionStorage;
+use crate::traits::Physics;
+use crate::Distribution;
 
 /// Lattice-Boltzmann Solver state
-pub struct Solver<P: ::Physics> {
+pub struct Solver<P: Physics> {
     grid: grid::StructuredRectangular,
     pub bcs: boundary::Handler,
     physics: P,
@@ -16,7 +18,7 @@ pub struct Solver<P: ::Physics> {
     f_hlp: Box<[num]>,
 }
 
-impl<P: ::Physics> Solver<P> {
+impl<P: Physics> Solver<P> {
     /// Create a new solver from a `grid` and `physics`.
     pub fn new(grid: grid::StructuredRectangular, physics: P) -> Solver<P> {
         Solver {
@@ -33,8 +35,7 @@ impl<P: ::Physics> Solver<P> {
     /// Initialize distributions functions using `initial_distributions(x)`.
     pub fn initialize<F>(&mut self, initial_distributions: F)
     where
-        F: Fn(grid::X)
-            -> DistributionStorage<P::Distribution>,
+        F: Fn(grid::X) -> DistributionStorage<P::Distribution>,
     {
         for c in self.grid.ids() {
             let fs = initial_distributions(self.grid.x(c));
@@ -72,9 +73,11 @@ impl<P: ::Physics> Solver<P> {
         f_hlp
             .par_chunks_mut(P::Distribution::size())
             .zip(self.grid.par_ids())
-            .for_each(|(f_hlp, c)| for n in P::Distribution::all() {
-                let cn = self.grid.neighbor(c, n);
-                f_hlp[n.value()] = *self.f_ref(cn, n);
+            .for_each(|(f_hlp, c)| {
+                for n in P::Distribution::all() {
+                    let cn = self.grid.neighbor(c, n);
+                    f_hlp[n.value()] = *self.f_ref(cn, n);
+                }
             });
         self.f_hlp = f_hlp;
     }
@@ -132,25 +135,26 @@ impl<P: ::Physics> Solver<P> {
 
         loop {
             let write_output = n_out > 0 && iter % n_out == 0;
-            let d = Duration::span(|| {
-                let d = Duration::span(|| self.streaming());
+            let (d, _) = Duration::time_fn(|| {
+                let (d, _) = Duration::time_fn(|| self.streaming());
                 if write_output {
                     self.substep("propagation", d);
                 }
 
-                let d = Duration::span(|| self.collision());
+                let (d, _) = Duration::time_fn(|| self.collision());
                 if write_output {
                     self.substep("collision", d);
                 }
 
-                let d = Duration::span(|| self.apply_boundary_conditions());
+                let (d, _) =
+                    Duration::time_fn(|| self.apply_boundary_conditions());
                 if write_output {
                     self.substep("bcs", d);
                 }
 
                 n_it -= 1;
                 if write_output {
-                    let d = Duration::span(|| self.write_vtk(iter));
+                    let (d, _) = Duration::time_fn(|| self.write_vtk(iter));
                     self.substep("vtk", d);
                 }
             });
@@ -180,7 +184,7 @@ impl<P: ::Physics> Solver<P> {
             "#{} | integral: {} | duration: {} ms",
             n_it,
             integral,
-            duration.num_milliseconds()
+            duration.whole_milliseconds(),
         );
     }
     /// Prints line info of an iteration sub-step
@@ -190,7 +194,7 @@ impl<P: ::Physics> Solver<P> {
             "# [{}] | integral: {} | duration: {} \u{03BC}s",
             name,
             res,
-            duration.num_microseconds().unwrap()
+            duration.whole_milliseconds(),
         );
     }
 

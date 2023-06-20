@@ -1,5 +1,5 @@
-use grid;
 use super::Geometry;
+use crate::grid;
 
 pub struct Plane {
     n: (isize, isize),

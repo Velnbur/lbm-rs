@@ -2,6 +2,8 @@
 
 use rayon;
 
+use crate::{geometry, traits::Distribution};
+
 /// Index of a point in the grid.
 #[derive(Eq, Ord, PartialEq, PartialOrd, Copy, Clone, Debug)]
 pub struct Idx(pub usize);
@@ -45,7 +47,6 @@ impl StructuredRectangular {
         (0..self.size()).into_par_iter().map(Idx::new)
     }
 
-
     /// Returns the coordinates of a given point id
     #[inline(always)]
     pub fn x(&self, i: Idx) -> X {
@@ -68,7 +69,7 @@ impl StructuredRectangular {
 
     /// Returns the neighbor of the point `c` in direction `dir`
     #[inline(always)]
-    pub fn neighbor<D: ::Distribution>(&self, c: Idx, dir: D) -> Idx {
+    pub fn neighbor<D: Distribution>(&self, c: Idx, dir: D) -> Idx {
         let X(x_i, y_i) = self.x(c);
 
         // handle periodic boundaries:
@@ -90,9 +91,6 @@ impl StructuredRectangular {
         }
     }
 }
-
-
-
 
 #[cfg(test)]
 mod tests {
@@ -121,8 +119,6 @@ mod tests {
                 println!("i: {}, j: {}, x: {:?}, idx: {:?}", i, j, x, idx);
                 assert_eq!(g.x(idx), x);
                 assert_eq!(g.idx(x), idx);
-
-
 
                 c += 1;
             }

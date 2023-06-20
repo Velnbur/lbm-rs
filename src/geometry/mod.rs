@@ -1,5 +1,5 @@
-use num;
-use grid;
+use crate::grid;
+use crate::num;
 
 mod point;
 
@@ -48,6 +48,5 @@ impl Direction {
 }
 
 pub trait Geometry {
-    #[inline(always)]
     fn contains(&self, x: grid::X) -> bool;
 }
