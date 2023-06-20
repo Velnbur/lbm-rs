@@ -3,7 +3,9 @@
 with pkgs; mkShell {
   nativeBuildInputs = [
     cargo
-  ];
+  ] ++ (lib.optionals stdenv.isDarwin [
+    libiconv
+  ]);
 
   buildInputs = [
     rust-analyzer
