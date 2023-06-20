@@ -13,7 +13,7 @@ use time;
 pub struct Solver<P: Physics> {
     grid: grid::StructuredRectangular,
     pub bcs: boundary::Handler,
-    physics: P,
+    pub physics: P,
     f: Box<[num]>, // Distribution functions
     f_hlp: Box<[num]>,
 }
