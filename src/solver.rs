@@ -168,6 +168,13 @@ impl<P: Physics> Solver<P> {
         }
     }
 
+    /// make one iteration
+    pub fn iteration(&mut self) {
+        self.streaming();
+        self.collision();
+        self.apply_boundary_conditions();
+    }
+
     /// Integrates the distribution functions over the volume
     fn integral(&self) -> num {
         use rayon::prelude::*;
