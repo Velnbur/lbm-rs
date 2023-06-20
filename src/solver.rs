@@ -11,7 +11,7 @@ use time;
 
 /// Lattice-Boltzmann Solver state
 pub struct Solver<P: Physics> {
-    grid: grid::StructuredRectangular,
+    pub grid: grid::StructuredRectangular,
     pub bcs: boundary::Handler,
     pub physics: P,
     f: Box<[num]>, // Distribution functions
